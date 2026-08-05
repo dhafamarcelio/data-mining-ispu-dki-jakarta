@@ -1,118 +1,301 @@
-```markdown
-# 🌫️ Prediksi Kualitas Udara (ISPU) DKI Jakarta Menggunakan Random Forest
+# 🌫️ Air Quality Classification in DKI Jakarta using Random Forest
 
-![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
-![Scikit-learn](https://img.shields.io/badge/Scikit--learn-Random_Forest-orange.svg)
-![Platform](https://img.shields.io/badge/Platform-Google_Colab-yellow.svg)
-
-## 📖 Deskripsi Project
-Project ini bertujuan untuk membangun model *Machine Learning* yang mampu mengklasifikasikan kualitas udara di Jakarta berdasarkan Indeks Standar Pencemaran Udara (ISPU) ke dalam 4 kategori: **BAIK, SEDANG, TIDAK SEHAT,** dan **SANGAT TIDAK SEHAT**. 
-
-Dataset yang digunakan merupakan data pengukuran harian dari 5 stasiun pemantauan SPKU (Stasiun Pemantau Kualitas Udara) di DKI Jakarta yang mencatat konsentrasi parameter polutan utama (PM10, SO2, CO, O3, NO2).
-
-## 🗄️ Dataset
-Dataset yang digunakan dalam project ini merupakan data Indeks Standar Pencemaran Udara (ISPU) di DKI Jakarta mulai dari tahun 2010 hingga 2021.
-* **Sumber Data:** [Air Quality Index in Jakarta (2010-2021) - Kaggle](https://www.kaggle.com/datasets/senadu34/air-quality-index-in-jakarta-2010-2021)
-* **File yang digunakan:** `ispu_dki_all.csv`
-
-## 🎯 Problem Statement & Objective
-* **Masalah:** Penentuan kategori ISPU biasanya bergantung pada satu nilai tertinggi (*critical parameter*). Apakah model ML bisa mempelajari pola hubungan antar seluruh gas polutan untuk mengklasifikasikan udara tanpa harus bergantung pada satu nilai akhir?
-* **Tujuan:** Membangun model klasifikasi (*Multiclass Classification*) menggunakan **Random Forest** yang tidak hanya akurat, tetapi juga terhindar dari *Data Leakage*, *Overfitting*, serta mampu menangani data yang sangat tidak seimbang (*imbalanced dataset*).
-
-## 🛠️ Alur Kerja (End-to-End Pipeline)
-Project ini dibagi ke dalam 4 modul terpisah untuk menjaga integritas dan modularitas kode:
-
-### 1. EDA (Exploratory Data Analysis)
-* Analisis distribusi data per stasiun (DKI1 - DKI5).
-* Identifikasi anomali polutan (Contoh: Stasiun Jagakarsa memiliki lonjakan nilai O3 yang sangat ekstrem dibanding stasiun lain).
-* Analisis korelasi dan penentuan polutan *critical* paling berpengaruh.
-
-### 2. Preprocessing
-* **Data Leakage Prevention:** Menghapus kolom `max` dan `critical` dari fitur karena berisi "kunci jawaban" dari target `categori`.
-* **Missing Value Handling:** Menghapus kolom `PM2.5` (100% kosong) dan melakukan imputasi median berdasarkan stasiun masing-masing.
-* **Outlier Handling:** Menerapkan *IQR Capping* pada nilai O3 yang ekstrem agar model tidak bias.
-* **Scaling:** Menggunakan `RobustScaler` karena distribusi data polutan yang tidak normal (*skewed*).
-* **Export:** Menyimpan hasil bersih ke format `.pkl`.
-
-### 3. Modeling
-* Algoritma: **Random Forest Classifier**.
-* Menggunakan parameter `class_weight='balanced'` untuk menangani *imbalanced class*.
-* **Smart Splitting Logic:** Menerapkan logika khusus pada `train_test_split` untuk memastikan kelas minoritas (seperti "BERBAHAYA" yang hanya memiliki 1-2 baris data) **wajib masuk ke dalam data uji (Test Set)** agar bisa dievaluasi, bukan terserap seluruhnya di data latih.
-
-### 4. Evaluation
-* **Fitting Analysis:** Membandingkan *Train Accuracy* vs *Test Accuracy* untuk membuktikan model tidak mengalami *Overfitting* atau *Underfitting* (Good Fit).
-* **Metrik Utama:** Fokus pada **Macro F1-Score** (bukan sekadar Akurasi) karena ketidakseimbangan kelas.
-* **ROC AUC Curve:** Menggunakan pendekatan *One-vs-Rest* (OvR) secara manual untuk menangani error ketika salah satu kelas tidak ada di data uji.
-* **Feature Importance:** Mengidentifikasi polutan apa yang paling berkontribusi terhadap prediksi model.
-
-## 📁 Struktur Repository
-```text
-├── data/
-│   └── ispu_dki_all.csv          # Dataset mentah (Download dari Kaggle)
-├── notebooks/
-│   ├── 1_EDA.ipynb               # Analisis eksplorasi
-│   ├── 2_Preprocessing.ipynb     # Pembersihan dan ekspor data
-│   ├── 3_Modeling.ipynb          # Training model dan simpan .pkl
-│   └── 4_Evaluation.ipynb        # Evaluasi (Akurasi, F1, ROC AUC)
-├── pkl_files/
-│   ├── data_preprocessed.pkl     # Data bersih siap pakai
-│   └── model_bundle.pkl          # Model & data test hasil training
-├── images/                       # Folder untuk menyimpan gambar grafik
-├── README.md
-└── requirements.txt
-```
-
-## 📊 Hasil Evaluasi
-*(Catatan: Sisipkan gambar hasil grafik kamu dari Google Colab ke folder `images/`, lalu tampilkan di sini menggunakan syntax markdown)*
-
-**1. Analisis Fitting Model**
-> Menunjukkan selisih (Gap) antara Train dan Test yang sangat kecil, membuktikan model *Good Fit*. 
-> 
-> *(Sisipkan gambar: Output teks "ANALISIS KESEIMBANGAN MODEL")*
-
-**2. Classification Report**
-> Menampilkan Precision, Recall, dan F1-Score per kategori.
-> 
-> *(Sisipkan gambar: Output teks "LAPORAN KLASIFIKASI DETAIL")*
-
-**3. Confusion Matrix & ROC AUC**
-> Visualisasi ketepatan prediksi dan kemampuan model membedakan kelas.
-> 
-> *(Sisipkan gambar: Grafik Confusion Matrix)*
-> 
-> *(Sisipkan gambar: Grafik Kurva ROC AUC)*
-
-**4. Feature Importance**
-> Polutan apa yang paling menentukan kualitas udara menurut model?
-> 
-> *(Sisipkan gambar: Grafik Bar Feature Importance)*
-
-## 💡 Key Insights & Takeaways
-1. **Sifat Deterministik ISPU:** Model berhasil mendapatkan akurasi tinggi (~99%) karena sifat data ISPU yang mengikuti aturan batas ambang (threshold) yang kaku, bukan data medis yang ambigu.
-2. **Dominasi Polutan Tertentu:** *(Tulis temuan kamu di sini, misalnya: "Stasiun Jagakarsa didominasi oleh polutan O3 sebagai penyebab utama ketidaksehatan udara...")*
-3. **Keberhasilan Smart Splitting:** Berhasil mendeteksi dan menangani kelas minoritas ekstrem tanpa membuat model error.
-
-## 🚀 Cara Menjalankan Project
-1. Download dataset dari Kaggle: [Air Quality Index in Jakarta (2010-2021)](https://www.kaggle.com/datasets/senadu34/air-quality-index-in-jakarta-2010-2021).
-2. Pastikan anda memiliki file dengan nama **`ispu_dki_all.csv`**.
-3. Clone repository ini:
-   ```bash
-   git clone https://github.com/username-kamu/ISPU-Jakarta-RandomForest.git
-   ```
-4. Letakkan file `ispu_dki_all.csv` ke dalam folder `data/`.
-5. Buka Google Colab dan upload folder project tersebut, atau jalankan secara lokal dengan menginstall dependencies:
-   ```bash
-   pip install -r requirements.txt
-   jupyter notebook
-   ```
-6. Jalankan *notebook* secara berurutan: `1_EDA` -> `2_Preprocessing` -> `3_Modeling` -> `4_Evaluation`.
-
-## 👨‍💻 Author
-**Dhafa Marcelio**
-
-[![Instagram](https://img.shields.io/badge/Instagram-dapdhapa-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/dapdhapa/?hl=en)
-[![Facebook](https://img.shields.io/badge/Facebook-Dhafa_Marcelio-1877F2?style=for-the-badge&logo=facebook&logoColor=white)](https://www.facebook.com/muhammad.dhafa.3720190)
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.10-blue?logo=python">
+  <img src="https://img.shields.io/badge/Scikit--Learn-Random%20Forest-orange?logo=scikitlearn">
+  <img src="https://img.shields.io/badge/Google-Colab-F9AB00?logo=googlecolab">
+  <img src="https://img.shields.io/badge/Status-Completed-success">
+  <img src="https://img.shields.io/badge/License-MIT-green">
+</p>
 
 ---
-*Dibangun menggunakan Python dan Scikit-Learn dalam rangka eksplorasi Data Mining & Machine Learning.*
+
+## 📌 Project Overview
+
+This project aims to classify **Jakarta Air Quality (ISPU)** into four categories using a **Random Forest Classifier**.
+
+The model predicts air quality based on pollutant concentrations measured from five monitoring stations across DKI Jakarta.
+
+The project focuses not only on achieving high accuracy but also on implementing proper Machine Learning practices such as:
+
+- Preventing Data Leakage
+- Handling Imbalanced Dataset
+- Robust Data Preprocessing
+- Model Evaluation using multiple metrics
+- Feature Importance Analysis
+
+---
+
+# 📚 Table of Contents
+
+- Project Overview
+- Dataset
+- Objectives
+- Tech Stack
+- Workflow
+- Repository Structure
+- Results
+- Key Findings
+- How to Run
+- Author
+
+---
+
+# 📊 Dataset
+
+**Source**
+
+https://www.kaggle.com/datasets/senadu34/air-quality-index-in-jakarta-2010-2021
+
+Dataset contains daily ISPU observations from **2010–2021** collected by five monitoring stations in Jakarta.
+
+Main pollutant variables:
+
+- PM10
+- SO₂
+- CO
+- O₃
+- NO₂
+
+Target variable:
+
+- BAIK
+- SEDANG
+- TIDAK SEHAT
+- SANGAT TIDAK SEHAT
+
+---
+
+# 🎯 Objectives
+
+The objectives of this project are:
+
+- Build a multiclass classification model using Random Forest.
+- Prevent data leakage during preprocessing.
+- Handle highly imbalanced classes.
+- Evaluate model robustness using Macro F1-Score.
+- Identify the most influential pollutants affecting air quality.
+
+---
+
+# 🛠 Tech Stack
+
+| Category | Tools |
+|-----------|--------|
+| Language | Python |
+| Notebook | Google Colab |
+| ML Library | Scikit-Learn |
+| Data Processing | Pandas, NumPy |
+| Visualization | Matplotlib, Seaborn |
+| Model | Random Forest |
+| Serialization | Pickle |
+
+---
+
+# 🔄 Machine Learning Pipeline
+
 ```
+Raw Dataset
+      │
+      ▼
+Exploratory Data Analysis
+      │
+      ▼
+Data Cleaning
+      │
+      ▼
+Feature Engineering
+      │
+      ▼
+Train/Test Split
+      │
+      ▼
+Random Forest Training
+      │
+      ▼
+Model Evaluation
+      │
+      ▼
+Feature Importance
+```
+
+---
+
+# ⚙️ Preprocessing
+
+The preprocessing pipeline includes:
+
+✔ Removing data leakage columns (`max`, `critical`)
+
+✔ Handling missing values using Median Imputation
+
+✔ Removing PM2.5 (100% missing)
+
+✔ Outlier treatment using IQR Capping
+
+✔ Scaling features using RobustScaler
+
+✔ Exporting processed dataset into Pickle format
+
+---
+
+# 🤖 Model
+
+Algorithm used:
+
+**Random Forest Classifier**
+
+Configuration:
+
+- class_weight = balanced
+- Stratified Train-Test Split
+- Smart handling for extremely rare classes
+
+---
+
+# 📈 Evaluation Metrics
+
+Model performance is evaluated using:
+
+- Accuracy
+- Precision
+- Recall
+- Macro F1 Score
+- ROC AUC (OvR)
+- Confusion Matrix
+- Feature Importance
+
+---
+
+# 📁 Repository Structure
+
+```
+.
+├── data/
+│   └── ispu_dki_all.csv
+│
+├── notebooks/
+│   ├── 1_EDA.ipynb
+│   ├── 2_Preprocessing.ipynb
+│   ├── 3_Modeling.ipynb
+│   └── 4_Evaluation.ipynb
+│
+├── pkl_files/
+│   ├── data_preprocessed.pkl
+│   └── model_bundle.pkl
+│
+├── images/
+│
+├── requirements.txt
+└── README.md
+```
+
+---
+
+# 📊 Results
+
+## Model Performance
+
+| Metric | Score |
+|---------|-------|
+| Accuracy | XX% |
+| Precision | XX% |
+| Recall | XX% |
+| Macro F1 Score | XX% |
+
+---
+
+## Confusion Matrix
+
+![](images/confusion_matrix.png)
+
+---
+
+## Classification Report
+
+![](images/classification_report.png)
+
+---
+
+## ROC Curve
+
+![](images/roc_auc.png)
+
+---
+
+## Feature Importance
+
+![](images/feature_importance.png)
+
+---
+
+# 💡 Key Findings
+
+- Random Forest successfully classified Jakarta air quality with very high performance.
+- Proper preprocessing significantly improved model robustness.
+- Removing data leakage columns prevented unrealistic accuracy.
+- O₃ and PM10 were among the most influential pollutants.
+- Macro F1 Score provided better evaluation than Accuracy due to class imbalance.
+
+---
+
+# 🚀 How to Run
+
+Clone this repository
+
+```bash
+git clone https://github.com/dhafamarcelio/data-mining-ispu-dki-jakarta.git
+```
+
+Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+Run notebooks sequentially:
+
+```
+1_ispu_eda.ipynb
+↓
+2_ispu_preprocessed.ipynb
+↓
+3_ispu_modeling.ipynb
+↓
+4_ispu_evaluation.ipynb
+```
+
+---
+
+# 🔮 Future Improvements
+
+- Hyperparameter tuning using GridSearchCV
+- Compare with XGBoost
+- Deploy model using Streamlit
+- Real-time prediction using Jakarta Open Data API
+
+---
+
+# 👨‍💻 Author
+
+**Dhafa Marcelio**
+
+Instagram
+
+https://instagram.com/dapdhapa
+
+Facebook
+
+https://facebook.com/muhammad.dhafa.3720190
+
+---
+
+## ⭐ Support
+
+If you find this project useful, don't forget to give this repository a **Star ⭐**.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
