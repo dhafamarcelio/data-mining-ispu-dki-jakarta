@@ -239,15 +239,17 @@ For the remaining classes, the classifier consistently achieved F1-Scores betwee
 
 ## Confusion Matrix
 
-![](images/confusion_matrix.png)
+<p align="center">
+<img src="images/confusion_matrix.png" width="700">
+</p>
 
 ---
 
 ## ROC Curve
 
-![](images/roc_auc.png)
-
----
+<p align="center">
+<img src="images/roc_curve.png" width="700">
+</p>
 
 ## Feature Importance
 
