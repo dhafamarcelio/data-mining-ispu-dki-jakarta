@@ -175,18 +175,15 @@ Model performance is evaluated using:
 │   └── ispu_dki_all.csv
 │
 ├── notebooks/
-│   ├── 1_EDA.ipynb
-│   ├── 2_Preprocessing.ipynb
-│   ├── 3_Modeling.ipynb
-│   └── 4_Evaluation.ipynb
+│   ├── 1_ispu_eda.ipynb
+│   ├── 2_ispu_preprocessed.ipynb
+│   ├── 3_ispu_modeling.ipynb
+│   └── 4_ispu_evaluation.ipynb
 │
 ├── pkl_files/
 │   ├── data_preprocessed.pkl
 │   └── model_bundle.pkl
 │
-├── images/
-│
-├── requirements.txt
 └── README.md
 ```
 
