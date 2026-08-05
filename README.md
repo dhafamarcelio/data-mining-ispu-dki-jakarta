@@ -253,7 +253,9 @@ For the remaining classes, the classifier consistently achieved F1-Scores betwee
 
 ## Feature Importance
 
-![](images/feature_importance.png)
+<p align="center">
+<img src="images/feature_importance.png" width="700">
+</p>
 
 # 💡 Key Findings
 
