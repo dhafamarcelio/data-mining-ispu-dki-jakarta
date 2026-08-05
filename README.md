@@ -195,22 +195,51 @@ Model performance is evaluated using:
 
 | Metric | Score |
 |---------|-------|
-| Accuracy | XX% |
-| Precision | XX% |
-| Recall | XX% |
-| Macro F1 Score | XX% |
+| Train Accuracy | **99.75%** |
+| Test Accuracy | **94.95%** |
+| Accuracy Gap | **4.81%** |
+| Macro Precision | **0.77** |
+| Macro Recall | **0.75** |
+| Macro F1 Score | **0.76** |
+| Weighted F1 Score | **0.95** |
+
+---
+
+## Model Fitting Analysis
+
+The Random Forest model achieved a **Train Accuracy of 99.75%** and a **Test Accuracy of 94.95%**, resulting in a performance gap of only **4.81%**.
+
+This indicates that the model generalizes well to unseen data and does not suffer from severe overfitting.
+
+**Model Status:** ✅ Good Fit (Balanced)
+
+---
+
+## Classification Report
+
+| Class | Precision | Recall | F1-Score | Support |
+|--------|-----------|---------|----------|---------|
+| BAIK | 0.98 | 0.90 | 0.94 | 63 |
+| BERBAHAYA | 0.00 | 0.00 | 0.00 | 1 |
+| SANGAT TIDAK SEHAT | 0.97 | 0.95 | 0.96 | 41 |
+| SEDANG | 0.95 | 0.97 | 0.96 | 638 |
+| TIDAK SEHAT | 0.94 | 0.93 | 0.94 | 365 |
+
+---
+
+## Evaluation Summary
+
+Although the model achieved an overall **Accuracy of 94.95%**, the **Macro F1 Score reached 0.76** due to the extremely imbalanced dataset.
+
+The **BERBAHAYA** category contains only **one testing sample**, making it impossible for the model to learn sufficient patterns for reliable prediction.
+
+For the remaining classes, the classifier consistently achieved F1-Scores between **0.94 and 0.96**, demonstrating strong predictive performance for the majority of air quality categories.
 
 ---
 
 ## Confusion Matrix
 
 ![](images/confusion_matrix.png)
-
----
-
-## Classification Report
-
-![](images/classification_report.png)
 
 ---
 
@@ -224,15 +253,17 @@ Model performance is evaluated using:
 
 ![](images/feature_importance.png)
 
----
-
 # 💡 Key Findings
 
-- Random Forest successfully classified Jakarta air quality with very high performance.
-- Proper preprocessing significantly improved model robustness.
-- Removing data leakage columns prevented unrealistic accuracy.
-- O₃ and PM10 were among the most influential pollutants.
-- Macro F1 Score provided better evaluation than Accuracy due to class imbalance.
+- The Random Forest classifier achieved **94.95% testing accuracy**, demonstrating strong predictive capability for Jakarta's air quality classification.
+
+- The model exhibited **Good Fit**, with only a **4.81% accuracy gap** between training and testing datasets.
+
+- Extremely imbalanced classes significantly affected the **Macro F1 Score**. The **BERBAHAYA** class contained only one testing sample, resulting in zero Precision and Recall for that category.
+
+- Despite the class imbalance, the model maintained **excellent performance** on the major classes (BAIK, SEDANG, TIDAK SEHAT, and SANGAT TIDAK SEHAT), each achieving F1-Scores above **0.94**.
+
+- These findings indicate that Random Forest is highly effective for ISPU classification when sufficient training samples are available for each category.
 
 ---
 
